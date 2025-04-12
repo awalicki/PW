@@ -26,7 +26,7 @@ namespace TP.ConcurrentProgramming.Data
             for (int i = 0; i < numberOfBalls; i++)
             {
                 Vector startingPosition = new(random.Next(100, 400 - 100), random.Next(100, 400 - 100));
-                Vector startingVelocity = new(random.Next(2, 8 - 2), random.Next(2, 8 - 2)); // losowa stała prędkość w jedną stronę
+                Vector startingVelocity = new(random.Next(-8 - -2, 8 - 2), random.Next(-8 - -2, 8 - 2)); // losowa stała prędkość w jedną stronę
                 Ball newBall = new(startingPosition, startingVelocity);
                 upperLayerHandler(startingPosition, newBall);
                 BallsList.Add(newBall);
@@ -70,8 +70,8 @@ namespace TP.ConcurrentProgramming.Data
         {
             foreach (Ball item in BallsList)
             {
-                //promien kul to 14, punkt (0,0) to w zasadzie punkt (14,14) wiec od prawej i dolnej sciany trzeba odjac dwa promienie
-                item.MoveWithBounds((Vector)item.Velocity, 0, 372, 0, 372);
+                //promien kul to 20, punkt (0,0) to w zasadzie punkt (20,20) wiec od prawej i dolnej sciany trzeba odjac dwa promienie i 
+                item.MoveWithBounds((Vector)item.Velocity, 0, 392, 0, 372);
             }
         }
 
