@@ -15,70 +15,119 @@ using ModelIBall = TP.ConcurrentProgramming.Presentation.Model.IBall;
 
 namespace TP.ConcurrentProgramming.Presentation.ViewModel
 {
-  public class MainWindowViewModel : ViewModelBase, IDisposable
-  {
-    #region ctor
-
-    public MainWindowViewModel() : this(null)
-    { }
-
-    internal MainWindowViewModel(ModelAbstractApi modelLayerAPI)
+    public class MainWindowViewModel : ViewModelBase, IDisposable
     {
-      ModelLayer = modelLayerAPI == null ? ModelAbstractApi.CreateModel() : modelLayerAPI;
-      Observer = ModelLayer.Subscribe<ModelIBall>(x => Balls.Add(x));
-    }
+        #region Properties and Commands
 
-    #endregion ctor
-
-    #region public API
-
-    public void Start(int numberOfBalls)
-    {
-      if (Disposed)
-        throw new ObjectDisposedException(nameof(MainWindowViewModel));
-      ModelLayer.Start(numberOfBalls);
-      Observer.Dispose();
-    }
-
-    public ObservableCollection<ModelIBall> Balls { get; } = new ObservableCollection<ModelIBall>();
-
-    #endregion public API
-
-    #region IDisposable
-
-    protected virtual void Dispose(bool disposing)
-    {
-      if (!Disposed)
-      {
-        if (disposing)
+        private string _ballsCountText;
+        public string BallsCountText
         {
-          Balls.Clear();
-          Observer.Dispose();
-          ModelLayer.Dispose();
+            get => _ballsCountText;
+            set
+            {
+                if (Set(ref _ballsCountText, value))
+                {
+                    StartCommand.RaiseCanExecuteChanged();
+                }
+            }
         }
 
-        // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-        // TODO: set large fields to null
-        Disposed = true;
-      }
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set => Set(ref _errorMessage, value);
+        }
+
+        public ObservableCollection<ModelIBall> Balls { get; } = new ObservableCollection<ModelIBall>();
+        public RelayCommand StartCommand { get; }
+
+        #endregion
+
+
+        #region ctor
+
+        public MainWindowViewModel() : this(null) { }
+
+        internal MainWindowViewModel(ModelAbstractApi modelLayerAPI)
+        {
+            ModelLayer = modelLayerAPI ?? ModelAbstractApi.CreateModel();
+            Observer = ModelLayer.Subscribe<ModelIBall>(x => Balls.Add(x));
+
+            StartCommand = new RelayCommand(
+                execute: StartAction,
+                canExecute: () => !string.IsNullOrEmpty(BallsCountText) &&
+                                int.TryParse(BallsCountText, out int count) &&
+                                count >= 1 && count <= 15
+            );
+        }
+
+
+        #endregion ctor
+
+        #region public API
+
+        private void StartAction()
+        {
+            if (int.TryParse(BallsCountText, out int ballCount) && ballCount >= 1 && ballCount <= 15)
+            {
+                ErrorMessage = string.Empty;
+                Start(ballCount);
+            }
+            else
+            {
+                ErrorMessage = "Podaj liczbę z przedziału 1-15.";
+            }
+        }
+
+        private void Start(int numberOfBalls)
+        {
+            if (Disposed)
+                throw new ObjectDisposedException(nameof(MainWindowViewModel));
+
+            // Clear previous balls
+            Balls.Clear();
+
+            ModelLayer.Start(numberOfBalls);
+        }
+
+        #endregion public API
+
+        #region IDisposable
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!Disposed)
+            {
+                if (disposing)
+                {
+                    Balls.Clear();
+                    Observer.Dispose();
+                    ModelLayer.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                Disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (Disposed)
+                throw new ObjectDisposedException(nameof(MainWindowViewModel));
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion IDisposable
+
+        #region private
+
+        private IDisposable Observer = null;
+        private ModelAbstractApi ModelLayer;
+        private bool Disposed = false;
+
+        #endregion private
     }
-
-    public void Dispose()
-    {
-      if (Disposed)
-        throw new ObjectDisposedException(nameof(MainWindowViewModel));
-      Dispose(disposing: true);
-      GC.SuppressFinalize(this);
-    }
-
-    #endregion IDisposable
-
-    #region private
-
-    private IDisposable Observer = null;
-    private ModelAbstractApi ModelLayer;
-    private bool Disposed = false;
-
-    #endregion private
-  }
 }
