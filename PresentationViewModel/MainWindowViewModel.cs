@@ -19,6 +19,18 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
     {
         #region Properties and Commands
 
+        private bool _hasStarted = false;
+        public bool HasStarted
+        {
+            get => _hasStarted;
+            set
+            {
+                if (Set(ref _hasStarted, value))
+                    StartCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+
         private string _ballsCountText;
         public string BallsCountText
         {
@@ -56,9 +68,10 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
 
             StartCommand = new RelayCommand(
                 execute: StartAction,
-                canExecute: () => !string.IsNullOrEmpty(BallsCountText) &&
-                                int.TryParse(BallsCountText, out int count) &&
-                                count >= 1 && count <= 15
+                canExecute: () => !HasStarted &&
+                !string.IsNullOrEmpty(BallsCountText) &&
+                int.TryParse(BallsCountText, out int count) &&
+                count >= 1 && count <= 15
             );
         }
 
@@ -73,6 +86,7 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
             {
                 ErrorMessage = string.Empty;
                 Start(ballCount);
+                HasStarted = true;
             }
             else
             {
