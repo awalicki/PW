@@ -94,7 +94,7 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
             }
         }
 
-        private void Start(int numberOfBalls)
+        internal void Start(int numberOfBalls)
         {
             if (Disposed)
                 throw new ObjectDisposedException(nameof(MainWindowViewModel));
