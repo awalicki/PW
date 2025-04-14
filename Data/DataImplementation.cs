@@ -70,7 +70,7 @@ namespace TP.ConcurrentProgramming.Data
         {
             foreach (Ball item in BallsList)
             {
-                //promien kul to 20, punkt (0,0) to w zasadzie punkt (20,20) wiec od prawej i dolnej sciany trzeba odjac dwa promienie i 
+                //srednica kul to 20, a grubosc scian to 4 zatem odejmujemy 28 od prawej i dolnej sciany
                 item.MoveWithBounds((Vector)item.Velocity, 0, 392, 0, 372);
             }
         }
