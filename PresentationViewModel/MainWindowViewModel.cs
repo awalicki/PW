@@ -99,7 +99,6 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
             if (Disposed)
                 throw new ObjectDisposedException(nameof(MainWindowViewModel));
 
-            // Clear previous balls
             Balls.Clear();
 
             ModelLayer.Start(numberOfBalls);

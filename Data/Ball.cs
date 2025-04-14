@@ -24,7 +24,6 @@
 
         private Vector Position;
 
-        // Pomocnicze - żeby kod był czytelniejszy
         private Vector InternalVelocity => (Vector)Velocity;
 
         private void RaiseNewPositionChangeNotification()

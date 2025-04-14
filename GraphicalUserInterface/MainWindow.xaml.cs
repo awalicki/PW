@@ -23,6 +23,12 @@ namespace TP.ConcurrentProgramming.PresentationView
             InitializeComponent();
         }
 
+
+        /// <summary>
+        /// Raises the <seealso cref="System.Windows.Window.Closed"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param> 
+
         protected override void OnClosed(EventArgs e)
         {
             if (DataContext is MainWindowViewModel viewModel)
