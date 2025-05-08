@@ -18,8 +18,9 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
         #region Properties and Commands
-
+       
         private bool _hasStarted = false;
+        
         public bool HasStarted
         {
             get => _hasStarted;
@@ -50,6 +51,53 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
             get => _errorMessage;
             set => Set(ref _errorMessage, value);
         }
+
+        private static double _tableSize = 0.7;
+        private double _scale = _tableSize;
+        private double _windowWidth = 400;
+        private double _windowHeight = 420;
+        public double Scale
+        {
+            get => _scale;
+            set
+            {
+                _scale = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public double WindowWidth
+        {
+            get => _windowWidth;
+            set
+            {
+                _windowWidth = value;
+                RaisePropertyChanged();
+                UpdateScale();
+            }
+        }
+
+        public double WindowHeight
+        {
+            get => _windowHeight;
+            set
+            {
+                _windowHeight = value;
+                RaisePropertyChanged();
+                UpdateScale();
+            }
+        }
+
+        private void UpdateScale()
+        {
+            double baseWidth = 420;
+            double baseHeight = 400;
+            double scaleX = WindowWidth / baseWidth;
+            double scaleY = WindowHeight / baseHeight;
+            Scale = _tableSize * Math.Min(scaleX, scaleY);
+        }
+
+
 
         public ObservableCollection<ModelIBall> Balls { get; } = new ObservableCollection<ModelIBall>();
         public RelayCommand StartCommand { get; }
