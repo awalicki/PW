@@ -60,9 +60,15 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
       }
     }
 
-    #region testing instrumentation
+    private record DataVectorFixture : Data.IVector
+    {
+        public double x { get; init; }
+        public double y { get; init; }
+    }
 
-    private class DataLayerConstructorFixcure : Data.DataAbstractAPI
+        #region testing instrumentation
+
+        private class DataLayerConstructorFixcure : Data.DataAbstractAPI
     {
       public override void Dispose()
       { }
@@ -71,9 +77,15 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
       {
         throw new NotImplementedException();
       }
+
+        public override IVector CreateVector(double x, double y)
+        {
+            return new DataVectorFixture { x = x, y = y };
+        }
+
     }
 
-    private class DataLayerDisposeFixcure : Data.DataAbstractAPI
+        private class DataLayerDisposeFixcure : Data.DataAbstractAPI
     {
       internal bool Disposed = false;
 
@@ -86,9 +98,15 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
       {
         throw new NotImplementedException();
       }
+
+        public override IVector CreateVector(double x, double y)
+        {
+            return new DataVectorFixture { x = x, y = y };
+        }
+
     }
 
-    private class DataLayerStartFixcure : Data.DataAbstractAPI
+        private class DataLayerStartFixcure : Data.DataAbstractAPI
     {
       internal bool StartCalled = false;
       internal int NumberOfBallseCreated = -1;
@@ -102,19 +120,24 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         NumberOfBallseCreated = numberOfBalls;
         upperLayerHandler(new DataVectorFixture(), new DataBallFixture());
       }
+        public override IVector CreateVector(double x, double y)
+        {
+            return new DataVectorFixture { x = x, y = y };
+        }
 
-      private record DataVectorFixture : Data.IVector
-      {
-        public double x { get; init; }
-        public double y { get; init; }
-      }
 
-      private class DataBallFixture : Data.IBall
-      {
-        public IVector Velocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private record DataVectorFixture : Data.IVector
+        {
+            public double x { get; init; }
+            public double y { get; init; }
+        }
 
-        public event EventHandler<IVector>? NewPositionNotification = null;
-      }
+        private class DataBallFixture : Data.IBall
+        {
+            public IVector Velocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public event EventHandler<IVector>? NewPositionNotification = null;
+        }
     }
 
     #endregion testing instrumentation
