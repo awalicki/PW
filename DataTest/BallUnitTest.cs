@@ -8,6 +8,8 @@
 //
 //_____________________________________________________________________________________________________________________________________
 
+using System.Reflection;
+
 namespace TP.ConcurrentProgramming.Data.Test
 {
   [TestClass]
@@ -23,14 +25,26 @@ namespace TP.ConcurrentProgramming.Data.Test
     [TestMethod]
     public void MoveTestMethod()
     {
-      Vector initialPosition = new(10.0, 10.0);
-      Ball newInstance = new(initialPosition, new Vector(0.0, 0.0));
-      IVector curentPosition = new Vector(0.0, 0.0);
-      int numberOfCallBackCalled = 0;
-      newInstance.NewPositionNotification += (sender, position) => { Assert.IsNotNull(sender); curentPosition = position; numberOfCallBackCalled++; };
-      newInstance.Move(new Vector(0.0, 0.0));
-      Assert.AreEqual<int>(1, numberOfCallBackCalled);
-      Assert.AreEqual<IVector>(initialPosition, curentPosition);
+        Vector initialPosition = new(10.0, 10.0);
+        Vector delta = new(0.0, 0.0); // <- delta do przesunięcia
+        Ball newInstance = new(initialPosition, new Vector(0.0, 0.0));
+        IVector curentPosition = new Vector(0.0, 0.0);
+        int numberOfCallBackCalled = 0;
+
+        newInstance.NewPositionNotification += (sender, position) => {
+            Assert.IsNotNull(sender);
+            curentPosition = position;
+            numberOfCallBackCalled++;
+        };
+
+        Type ballType = typeof(Ball);
+        MethodInfo? moveMethod = ballType.GetMethod("Move", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(Vector) }, null);
+        Assert.IsNotNull(moveMethod, "Private method 'Move' was not found.");
+        moveMethod.Invoke(newInstance, new object[] { delta });
+
+        Assert.AreEqual<int>(1, numberOfCallBackCalled);
+        Assert.AreEqual<IVector>(initialPosition, curentPosition);
     }
+
   }
 }

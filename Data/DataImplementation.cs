@@ -1,30 +1,27 @@
 ﻿//____________________________________________________________________________________________________________________________________
 //
-//  Copyright (C) 2024, Mariusz Postol LODZ POLAND.
+//  Copyright (C) 2024, Mariusz Postol LODZ POLAND.
 //
-//  To be in touch join the community by pressing the `Watch` button and get started commenting using the discussion panel at
+//  To be in touch join the community by pressing the `Watch` button and get started commenting using the discussion panel at
 //
-//  https://github.com/mpostol/TP/discussions/182
+//  https://github.com/mpostol/TP/discussions/182
 //
 //_____________________________________________________________________________________________________________________________________
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace TP.ConcurrentProgramming.Data
 {
     internal class DataImplementation : DataAbstractAPI
     {
-        #region ctor
+        public DataImplementation() { }
 
-        public DataImplementation()
-        {
-            MoveTimer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(100));
-        }
-
-        #endregion ctor
-
-        #region DataAbstractAPI
+        private readonly List<Task> _ballTasks = new List<Task>();
+        private readonly List<Ball> _ballsList = new List<Ball>();
 
         public override void Start(int numberOfBalls, Action<IVector, IBall> upperLayerHandler)
         {
@@ -32,14 +29,19 @@ namespace TP.ConcurrentProgramming.Data
                 throw new ObjectDisposedException(nameof(DataImplementation));
             if (upperLayerHandler == null)
                 throw new ArgumentNullException(nameof(upperLayerHandler));
+
             Random random = new Random();
+
             for (int i = 0; i < numberOfBalls; i++)
             {
                 Vector startingPosition = new(random.Next(100, 400 - 100), random.Next(100, 400 - 100));
-                Vector startingVelocity = new(random.Next(-8 - -2, 8 - 2), random.Next(-8 - -2, 8 - 2));
+                Vector startingVelocity = new(random.Next(-80 - -20, 80 - 20), random.Next(-80 - -20, 80 - 20));
                 Ball newBall = new(startingPosition, startingVelocity);
                 upperLayerHandler(startingPosition, newBall);
-                BallsList.Add(newBall);
+                Task movementTask = newBall.StartMovementTask();
+                _ballTasks.Add(movementTask);
+                _ballsList.Add(newBall);
+                Console.WriteLine($"Created Ball {i} at {startingPosition} with velocity {startingVelocity}");
             }
         }
 
@@ -48,9 +50,7 @@ namespace TP.ConcurrentProgramming.Data
             return new Vector(x, y);
         }
 
-        #endregion DataAbstractAPI
-
-        #region IDisposable
+        private bool Disposed = false;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -58,13 +58,38 @@ namespace TP.ConcurrentProgramming.Data
             {
                 if (disposing)
                 {
-                    MoveTimer.Dispose();
-                    BallsList.Clear();
+                    foreach (var ball in _ballsList)
+                    {
+                        ball.StopMovement();
+                    }
+
+                    try
+                    {
+                        Console.WriteLine("Waiting for ball tasks to finish...");
+                        Task.WhenAll(_ballTasks).Wait();
+                        Console.WriteLine("All ball tasks finished.");
+                    }
+                    catch (AggregateException ae)
+                    {
+                        foreach (var inner in ae.InnerExceptions)
+                        {
+                            if (inner is not TaskCanceledException)
+                            {
+                                Console.WriteLine($"Caught unexpected exception during Dispose: {inner.GetType().Name}: {inner.Message}");
+                            }
+                        }
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        Console.WriteLine("Dispose caught TaskCanceledException.");
+                    }
+
+                    _ballTasks.Clear();
+                    _ballsList.Clear();
                 }
+
                 Disposed = true;
             }
-            else
-                throw new ObjectDisposedException(nameof(DataImplementation));
         }
 
         public override void Dispose()
@@ -73,36 +98,16 @@ namespace TP.ConcurrentProgramming.Data
             GC.SuppressFinalize(this);
         }
 
-        #endregion IDisposable
-
-        #region private
-
-        private bool Disposed = false;
-        private readonly Timer MoveTimer;
-        private List<Ball> BallsList = [];
-
-        private void Move(object? x)
-        {
-            foreach (Ball item in BallsList)
-            {
-                item.Move((Vector)item.Velocity);
-            }
-        }
-
-        #endregion private
-
-        #region TestingInfrastructure
-
         [Conditional("DEBUG")]
         internal void CheckBallsList(Action<IEnumerable<IBall>> returnBallsList)
         {
-            returnBallsList(BallsList);
+            returnBallsList(_ballsList);
         }
 
         [Conditional("DEBUG")]
         internal void CheckNumberOfBalls(Action<int> returnNumberOfBalls)
         {
-            returnNumberOfBalls(BallsList.Count);
+            returnNumberOfBalls(_ballsList.Count);
         }
 
         [Conditional("DEBUG")]
@@ -110,7 +115,5 @@ namespace TP.ConcurrentProgramming.Data
         {
             returnInstanceDisposed(Disposed);
         }
-
-        #endregion TestingInfrastructure
     }
 }

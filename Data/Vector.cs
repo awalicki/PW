@@ -16,26 +16,31 @@ namespace TP.ConcurrentProgramming.Data
   /// </summary>
   internal record Vector : IVector
   {
-    #region IVector
+        #region IVector
 
-    /// <summary>
-    /// The X component of the vector.
-    /// </summary>
-    public double x { get; init; }
-    /// <summary>
-    /// The Y component of the vector.
-    /// </summary>
-    public double y { get; init; }
+        /// <summary>
+        /// The X component of the vector.
+        /// </summary>
+        public double x { get; init; }
+        /// <summary>
+        /// The Y component of the vector.
+        /// </summary>
+        public double y { get; init; }
 
-    #endregion IVector
+        #endregion IVector
 
-    /// <summary>
-    /// Creates new instance of <seealso cref="Vector"/> and initialize all properties
-    /// </summary>
-    public Vector(double XComponent, double YComponent)
-    {
-      x = XComponent;
-      y = YComponent;
+        /// <summary>
+        /// Creates new instance of <seealso cref="Vector"/> and initialize all properties
+        /// </summary>
+        public Vector(double XComponent, double YComponent)
+        {
+          x = XComponent;
+          y = YComponent;
+        }
+
+        public static Vector operator *(Vector v, double scalar)
+        {
+            return new Vector(v.x * scalar, v.y * scalar);
+        }
     }
-  }
 }

@@ -20,7 +20,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         {
             DataBallFixture dataBallFixture = new DataBallFixture();
             var dataLayer = new MockDataLayer(); // Tworzymy instancję mocka dataLayer
-            Ball newInstance = new(dataBallFixture, dataLayer);
+            var initialPosition = new Position(0.0, 0.0);
+            Ball newInstance = new(dataBallFixture, dataLayer, initialPosition);
             int numberOfCallBackCalled = 0;
             newInstance.NewPositionNotification += (sender, position) => {
                 Assert.IsNotNull(sender);
@@ -35,7 +36,13 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
 
         private class DataBallFixture : Data.IBall
         {
-            public Data.IVector Velocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+            private Data.IVector _velocity = new VectorFixture(1.0, 1.0); // przykładowe wartości
+
+            public Data.IVector Velocity
+            {
+                get => _velocity;
+                set => _velocity = value;
+            }
 
             public event EventHandler<Data.IVector>? NewPositionNotification;
 
