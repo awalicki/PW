@@ -31,10 +31,42 @@ namespace TP.ConcurrentProgramming.Data
                 throw new ArgumentNullException(nameof(upperLayerHandler));
 
             Random random = new Random();
+            const double ballRadius = 10.0; // Promień piłki (10 pikseli)
+            const double minDistance = 2 * ballRadius; // Minimalna odległość między środkami piłek (20 pikseli)
+            List<IVector> existingPositions = new List<IVector>(); // Lista pozycji istniejących piłek
 
             for (int i = 0; i < numberOfBalls; i++)
             {
-                Vector startingPosition = new(random.Next(100, 400 - 100), random.Next(100, 400 - 100));
+                Vector startingPosition = null;
+                bool validPosition = false;
+                int maxAttempts = 1000; // Maksymalna liczba prób genew(rowania pozycji
+
+                // Próbuj znaleźć odpowiednią pozycję
+                for (int attempt = 0; attempt < maxAttempts && !validPosition; attempt++)
+                {
+                    // Generuj losową pozycję w granicach (100, 400, 300, 300)
+                    startingPosition = new Vector(random.Next(100, 300), random.Next(100, 380));
+                    validPosition = true;
+
+                    // Sprawdź odległość od wszystkich istniejących piłek
+                    foreach (var pos in existingPositions)
+                    {
+                        double distance = Math.Sqrt(Math.Pow(startingPosition.x - pos.x, 2) + Math.Pow(startingPosition.y - pos.y, 2));
+                        if (distance < minDistance)
+                        {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!validPosition)
+                {
+                    Console.WriteLine($"Warning: Could not find valid position for ball {i} after {maxAttempts} attempts. Using last generated position.");
+                }
+                Console.WriteLine($"Warning: Could not find valid position for ball {i} after {maxAttempts} attempts. Using last generated position.");
+                // Dodaj pozycję do listy
+                existingPositions.Add(startingPosition);
                 Vector startingVelocity = new(random.Next(-80 - -20, 80 - 20), random.Next(-80 - -20, 80 - 20));
                 Ball newBall = new(startingPosition, startingVelocity);
                 upperLayerHandler(startingPosition, newBall);
