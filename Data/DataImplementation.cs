@@ -31,8 +31,7 @@ namespace TP.ConcurrentProgramming.Data
                 throw new ArgumentNullException(nameof(upperLayerHandler));
 
             Random random = new Random();
-            const double ballRadius = 10.0; // Promień piłki (10 pikseli)
-            const double minDistance = 2 * ballRadius; // Minimalna odległość między środkami piłek (20 pikseli)
+            const double minDistance = 25;
             List<IVector> existingPositions = new List<IVector>(); // Lista pozycji istniejących piłek
 
             for (int i = 0; i < numberOfBalls; i++)
@@ -60,13 +59,9 @@ namespace TP.ConcurrentProgramming.Data
                     }
                 }
 
-                if (!validPosition)
-                {
-                    Console.WriteLine($"Warning: Could not find valid position for ball {i} after {maxAttempts} attempts. Using last generated position.");
-                }
-                Console.WriteLine($"Warning: Could not find valid position for ball {i} after {maxAttempts} attempts. Using last generated position.");
                 // Dodaj pozycję do listy
                 existingPositions.Add(startingPosition);
+
                 Vector startingVelocity = new(random.Next(-80 - -20, 80 - 20), random.Next(-80 - -20, 80 - 20));
                 Ball newBall = new(startingPosition, startingVelocity);
                 upperLayerHandler(startingPosition, newBall);
