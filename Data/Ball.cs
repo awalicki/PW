@@ -16,16 +16,19 @@ namespace TP.ConcurrentProgramming.Data
 {
     internal class Ball : IBall
     {
-        internal Ball(Vector initialPosition, Vector initialVelocity)
+        internal Ball(Vector initialPosition, Vector initialVelocity, double weight)
         {
             Position = initialPosition;
             Velocity = initialVelocity;
+            Weight = weight;
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
         public event EventHandler<IVector>? NewPositionNotification;
 
         public IVector Velocity { get; set; }
+
+        public double Weight { get; }
 
         public void StopMovement()
         {

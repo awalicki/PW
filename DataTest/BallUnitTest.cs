@@ -19,7 +19,8 @@ namespace TP.ConcurrentProgramming.Data.Test
     public void ConstructorTestMethod()
     {
       Vector testinVector = new Vector(0.0, 0.0);
-      Ball newInstance = new(testinVector, testinVector);
+      double weight = 1.0;
+      Ball newInstance = new(testinVector, testinVector, weight);
     }
 
     [TestMethod]
@@ -27,7 +28,8 @@ namespace TP.ConcurrentProgramming.Data.Test
     {
         Vector initialPosition = new(10.0, 10.0);
         Vector delta = new(0.0, 0.0); // <- delta do przesunięcia
-        Ball newInstance = new(initialPosition, new Vector(0.0, 0.0));
+        double weight = 1.0;
+        Ball newInstance = new(initialPosition, new Vector(0.0, 0.0), weight);
         IVector curentPosition = new Vector(0.0, 0.0);
         int numberOfCallBackCalled = 0;
 

@@ -36,10 +36,12 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             if (Disposed)
                 throw new ObjectDisposedException(nameof(BusinessLogicImplementation));
 
-            foreach (var ball in _balls)
-                ball.DetachFromDataBall();
-
-            _balls.Clear();
+            lock (_lock)
+    {
+        foreach (var ball in _balls)
+            ball.DetachFromDataBall();
+        _balls.Clear();
+    }
             layerBellow.Dispose();
             Disposed = true;
         }
@@ -56,7 +58,10 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 var initialPositionBL = new Position(startingPositionFromData.x, startingPositionFromData.y);
                 var ball = new Ball(dataBall, layerBellow, initialPositionBL);
 
-                _balls.Add(ball);
+                lock (_lock)
+                {
+                    _balls.Add(ball);
+                }
 
                 ball.NewPositionNotification += (sender, pos) => OnBallMoved(ball);
                 upperLayerHandler(initialPositionBL, ball);
@@ -69,24 +74,45 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
         private void OnBallMoved(Ball movedBall)
         {
-            var pos1 = movedBall.GetPosition();
-
-            foreach (var other in _balls)
+            lock (_lock)
             {
-                if (other == movedBall)
-                    continue;
+                var pos1 = movedBall.GetPosition();
+                var v1 = movedBall.GetVelocity();
+                var m1 = movedBall.GetWeight();
 
-                var pos2 = other.GetPosition();
-
-                if (AreBallsColliding(pos1, pos2))
+                // Iterate through other balls to check for collisions
+                foreach (var other in _balls)
                 {
-                    var v1 = movedBall.GetVelocity();
+                    if (other == movedBall)
+                        continue; // Don't check collision with itself
+
+                    var pos2 = other.GetPosition();
                     var v2 = other.GetVelocity();
+                    var m2 = other.GetWeight();
 
-                    movedBall.SetVelocity(v2);
-                    other.SetVelocity(v1);
+                    // Check if balls are colliding based on distance
+                    if (AreBallsColliding(pos1, pos2))
+                    {
+                        Console.WriteLine($"BL: Collision detected between balls at ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2})");
 
-                    Console.WriteLine("BL: Collision between balls detected and resolved.");
+                        double totalMass = m1 + m2;
+
+                        if (totalMass > 0)
+                        {
+                            double newV1x = ((m1 - m2) * v1.x + 2 * m2 * v2.x) / totalMass;
+                            double newV1y = ((m1 - m2) * v1.y + 2 * m2 * v2.y) / totalMass;
+                            double newV2x = ((m2 - m1) * v2.x + 2 * m1 * v1.x) / totalMass;
+                            double newV2y = ((m2 - m1) * v2.y + 2 * m1 * v1.y) / totalMass;
+
+                            movedBall.SetVelocity(layerBellow.CreateVector(newV1x, newV1y));
+                            other.SetVelocity(layerBellow.CreateVector(newV2x, newV2y));
+                            Console.WriteLine($"BL: Masses: {m1:F2}, {m2:F2}. Old V1: ({v1.x:F2},{v1.y:F2}), Old V2: ({v2.x:F2},{v2.y:F2}). New V1: ({newV1x:F2},{newV1y:F2}), New V2: ({newV2x:F2},{newV2y:F2})");
+                        }
+                        else
+                        {
+                            Console.WriteLine("BL: Total mass is zero, cannot calculate collision response.");
+                        }
+                    }
                 }
             }
         }
@@ -96,7 +122,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             double dx = pos1.x - pos2.x;
             double dy = pos1.y - pos2.y;
             double distanceSquared = dx * dx + dy * dy;
-            return distanceSquared <= 400;
+            return distanceSquared < BallRadius * 2 * BallRadius * 2;
         }
 
         #endregion Collision Detection
@@ -107,6 +133,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         private readonly UnderneathLayerAPI layerBellow;
         private readonly List<Ball> _balls = new();
         private const double BallRadius = 10;
+        private readonly object _lock = new();
 
         #endregion private
 

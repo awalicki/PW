@@ -38,16 +38,11 @@ namespace TP.ConcurrentProgramming.Data
             {
                 Vector startingPosition = null;
                 bool validPosition = false;
-                int maxAttempts = 1000; // Maksymalna liczba prób genew(rowania pozycji
-
-                // Próbuj znaleźć odpowiednią pozycję
+                int maxAttempts = 1000;
                 for (int attempt = 0; attempt < maxAttempts && !validPosition; attempt++)
                 {
-                    // Generuj losową pozycję w granicach (100, 400, 300, 300)
                     startingPosition = new Vector(random.Next(100, 300), random.Next(100, 380));
                     validPosition = true;
-
-                    // Sprawdź odległość od wszystkich istniejących piłek
                     foreach (var pos in existingPositions)
                     {
                         double distance = Math.Sqrt(Math.Pow(startingPosition.x - pos.x, 2) + Math.Pow(startingPosition.y - pos.y, 2));
@@ -58,12 +53,11 @@ namespace TP.ConcurrentProgramming.Data
                         }
                     }
                 }
-
-                // Dodaj pozycję do listy
                 existingPositions.Add(startingPosition);
 
                 Vector startingVelocity = new(random.Next(-80 - -20, 80 - 20), random.Next(-80 - -20, 80 - 20));
-                Ball newBall = new(startingPosition, startingVelocity);
+                double weight = 1.0;
+                Ball newBall = new(startingPosition, startingVelocity, weight);
                 upperLayerHandler(startingPosition, newBall);
                 Task movementTask = newBall.StartMovementTask();
                 _ballTasks.Add(movementTask);

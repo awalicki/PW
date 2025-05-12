@@ -43,6 +43,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
                 get => _velocity;
                 set => _velocity = value;
             }
+            public double Weight => 1.0;
 
             public event EventHandler<Data.IVector>? NewPositionNotification;
 
