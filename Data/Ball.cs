@@ -20,6 +20,7 @@ namespace TP.ConcurrentProgramming.Data
         {
             Position = initialPosition;
             _velocity = initialVelocity;
+            BallRadius = 10;
             Weight = weight;
             _cancellationTokenSource = new CancellationTokenSource();
         }
@@ -47,6 +48,7 @@ namespace TP.ConcurrentProgramming.Data
         }
 
         public double Weight { get; }
+        public double BallRadius { get; }
 
         public void StopMovement()
         {

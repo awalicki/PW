@@ -140,6 +140,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
 
             public double Weight => 1.0;
 
+            public double BallRadius => 10.0;
+
         }
     }
 

@@ -47,6 +47,11 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         {
             return _underlyingBall.Weight;
         }
+        
+        public double GetBallRadius()
+        {
+            return _underlyingBall.BallRadius;
+        }
 
         public void SetVelocity(Data.IVector velocity)
         {

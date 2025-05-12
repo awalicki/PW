@@ -77,6 +77,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             var v1 = movedBall.GetVelocity();
             var m1 = movedBall.GetWeight();
 
+
             List<Ball> ballsCopy;
             lock (_lock)
             {
@@ -91,8 +92,9 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 var pos2 = other.GetPosition();
                 var v2 = other.GetVelocity();
                 var m2 = other.GetWeight();
+                var r1 = other.GetBallRadius();
 
-                if (AreBallsColliding(pos1, pos2))
+                if (AreBallsColliding(pos1, pos2, r1))
                 {
                     double dx = pos1.x - pos2.x;
                     double dy = pos1.y - pos2.y;
@@ -145,7 +147,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             }
         }
 
-        private bool AreBallsColliding(IPosition pos1, IPosition pos2)
+        private bool AreBallsColliding(IPosition pos1, IPosition pos2, double BallRadius)
         {
             double dx = pos1.x - pos2.x;
             double dy = pos1.y - pos2.y;
@@ -156,7 +158,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         private bool Disposed = false;
         private readonly UnderneathLayerAPI layerBellow;
         private readonly List<Ball> _balls = new();
-        private const double BallRadius = 10;
+        //private const double BallRadius = 10;
         private readonly object _lock = new();
 
         [Conditional("DEBUG")]

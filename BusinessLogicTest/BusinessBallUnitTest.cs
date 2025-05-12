@@ -44,6 +44,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
                 set => _velocity = value;
             }
             public double Weight => 1.0;
+            public double BallRadius => 10.0;
 
             public event EventHandler<Data.IVector>? NewPositionNotification;
 

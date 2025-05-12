@@ -60,6 +60,7 @@ namespace TP.ConcurrentProgramming.Data
     event EventHandler<IVector> NewPositionNotification;
 
     double Weight { get; }
+    double BallRadius { get; }
 
     IVector Velocity { get; set; }
   }
