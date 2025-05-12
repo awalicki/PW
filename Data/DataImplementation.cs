@@ -22,6 +22,7 @@ namespace TP.ConcurrentProgramming.Data
 
         private readonly List<Task> _ballTasks = new List<Task>();
         private readonly List<Ball> _ballsList = new List<Ball>();
+        private readonly object _balllock = new();
 
         public override void Start(int numberOfBalls, Action<IVector, IBall> upperLayerHandler)
         {
@@ -32,7 +33,7 @@ namespace TP.ConcurrentProgramming.Data
 
             Random random = new Random();
             const double minDistance = 25;
-            List<IVector> existingPositions = new List<IVector>(); // Lista pozycji istniejących piłek
+            List<IVector> existingPositions = new List<IVector>();
 
             for (int i = 0; i < numberOfBalls; i++)
             {
@@ -55,13 +56,16 @@ namespace TP.ConcurrentProgramming.Data
                 }
                 existingPositions.Add(startingPosition);
 
-                Vector startingVelocity = new(random.Next(-80 - -20, 80 - 20), random.Next(-80 - -20, 80 - 20));
+                Vector startingVelocity = new(random.Next(-100 - -20, 100 - 20), random.Next(-100 - -20, 100 - 20));
                 double weight = 1.0;
                 Ball newBall = new(startingPosition, startingVelocity, weight);
                 upperLayerHandler(startingPosition, newBall);
                 Task movementTask = newBall.StartMovementTask();
-                _ballTasks.Add(movementTask);
-                _ballsList.Add(newBall);
+                lock (_balllock)
+                {
+                    _ballTasks.Add(movementTask);
+                    _ballsList.Add(newBall);
+                }
                 Console.WriteLine($"Created Ball {i} at {startingPosition} with velocity {startingVelocity}");
             }
         }
@@ -79,9 +83,12 @@ namespace TP.ConcurrentProgramming.Data
             {
                 if (disposing)
                 {
-                    foreach (var ball in _ballsList)
+                    lock (_balllock)
                     {
-                        ball.StopMovement();
+                        foreach (var ball in _ballsList)
+                        {
+                            ball.StopMovement();
+                        }
                     }
 
                     try

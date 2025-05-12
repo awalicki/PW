@@ -19,14 +19,32 @@ namespace TP.ConcurrentProgramming.Data
         internal Ball(Vector initialPosition, Vector initialVelocity, double weight)
         {
             Position = initialPosition;
-            Velocity = initialVelocity;
+            _velocity = initialVelocity;
             Weight = weight;
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
         public event EventHandler<IVector>? NewPositionNotification;
+        private IVector _velocity;
+        private readonly object _velocityLock = new object();
 
-        public IVector Velocity { get; set; }
+        public IVector Velocity
+        {
+            get
+            {
+                lock (_velocityLock)
+                {
+                    return _velocity;
+                }
+            }
+            set
+            {
+                lock (_velocityLock)
+                {
+                    _velocity = value;
+                }
+            }
+        }
 
         public double Weight { get; }
 
@@ -60,7 +78,14 @@ namespace TP.ConcurrentProgramming.Data
                 try
                 {
                     await Task.Delay(movementIntervalMs, token);
-                    Vector velocityVector = (Vector)Velocity;
+
+                    IVector currentVelocity;
+                    lock (_velocityLock)
+                    {
+                        currentVelocity = _velocity;
+                    }
+
+                    Vector velocityVector = (Vector)currentVelocity;
                     Vector delta = velocityVector * (movementIntervalMs / 1000.0);
 
                     Move(delta);

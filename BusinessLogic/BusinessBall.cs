@@ -59,54 +59,46 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
         private void RaisePositionChangeEvent(object? sender, Data.IVector dataPosition)
         {
-            double currentVx = _underlyingBall.Velocity.x;
-            double currentVy = _underlyingBall.Velocity.y;
+            _currentPosition = new Position(dataPosition.x, dataPosition.y);
+
+            IPosition pos1 = _currentPosition;
+            Data.IVector v1 = GetVelocity();
+            double currentVx = v1.x;
+            double currentVy = v1.y;
             double newVx = currentVx;
             double newVy = currentVy;
-            double positionX = dataPosition.x;
-            double positionY = dataPosition.y;
-
-            if (positionX <= 0)
+            double positionX = pos1.x;
+            double positionY = pos1.y;
+            if (positionX <= 0 && currentVx < 0)
             {
-                if (currentVx < 0)
-                {
-                    newVx = -currentVx;
-                    Console.WriteLine($"BL: X Bounce Left at {positionX}");
-                }
+                newVx = -currentVx;
+                Console.WriteLine($"BL: X Bounce Left at {positionX:F2}");
             }
-            else if (positionX >= _tableWidth)
+            else if (positionX >= _tableWidth && currentVx > 0)
             {
-                if (currentVx > 0)
-                {
-                    newVx = -currentVx;
-                    Console.WriteLine($"BL: X Bounce Right at {positionX}");
-                }
+                newVx = -currentVx;
+                Console.WriteLine($"BL: X Bounce Right at {positionX:F2}");
             }
 
-            if (positionY <= 0)
+            if (positionY <= 0 && currentVy < 0)
             {
-                if (currentVy < 0)
-                {
-                    newVy = -currentVy;
-                    Console.WriteLine($"BL: Y Bounce Top at {positionY}");
-                }
+                newVy = -currentVy;
+                Console.WriteLine($"BL: Y Bounce Top at {positionY:F2}");
             }
-            else if (positionY >= _tableHeight)
+            else if (positionY >= _tableHeight && currentVy > 0)
             {
-                if (currentVy > 0)
-                {
-                    newVy = -currentVy;
-                    Console.WriteLine($"BL: Y Bounce Bottom at {positionY}");
-                }
+                newVy = -currentVy;
+                Console.WriteLine($"BL: Y Bounce Bottom at {positionY:F2}");
             }
 
             if (newVx != currentVx || newVy != currentVy)
             {
-                _underlyingBall.Velocity = _dataLayer.CreateVector(newVx, newVy);
-                Console.WriteLine($"BL: Updated Data Ball Velocity to ({newVx}, {newVy})");
-            }
-
-            _currentPosition = new Position(positionX, positionY);
+                SetVelocity(_dataLayer.CreateVector(newVx, newVy));
+                v1 = GetVelocity();
+                currentVx = v1.x;
+                currentVy = v1.y;
+                Console.WriteLine($"BL: Updated Data Ball Velocity (Wall) to ({newVx:F2}, {newVy:F2})");
+            }           
             NewPositionNotification?.Invoke(this, _currentPosition);
         }
 
