@@ -20,7 +20,6 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         private IPosition _currentPosition;
         private readonly double _tableWidth = 392;
         private readonly double _tableHeight = 372;
-
         internal Ball(Data.IBall ball, Data.DataAbstractAPI dataLayer, IPosition initialPosition)
         {
             _underlyingBall = ball;
@@ -102,6 +101,16 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 v1 = GetVelocity();
                 currentVx = v1.x;
                 currentVy = v1.y;
+                _dataLayer.LogDiagnosticData(new DiagnosticData
+                {
+                    Timestamp = DateTime.Now,
+                    PositionX = pos1.x,
+                    PositionY = pos1.y,
+                    VelocityX = newVx,
+                    VelocityY = newVy,
+                    EventType = DiagnosticEventType.WallBounce,
+                    Message = $"Wall bounce detected. New velocity: ({newVx:F2}, {newVy:F2}). "
+                });
                 Console.WriteLine($"BL: Updated Data Ball Velocity (Wall) to ({newVx:F2}, {newVy:F2})");
             }           
             NewPositionNotification?.Invoke(this, _currentPosition);

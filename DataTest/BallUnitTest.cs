@@ -15,21 +15,33 @@ namespace TP.ConcurrentProgramming.Data.Test
   [TestClass]
   public class BallUnitTest
   {
+    private Logger _testLogger;
+
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        _testLogger.Dispose();
+    }
+
     [TestMethod]
     public void ConstructorTestMethod()
     {
+      string tempLogFilePath = Path.Combine(Path.GetTempPath(), $"diagnostic_log_test_{Guid.NewGuid()}.txt");
+      _testLogger = new Logger(tempLogFilePath);
       Vector testinVector = new Vector(0.0, 0.0);
       double weight = 1.0;
-      Ball newInstance = new(testinVector, testinVector, weight);
+      Ball newInstance = new(testinVector, testinVector, weight, _testLogger);
     }
 
     [TestMethod]
     public void MoveTestMethod()
     {
+        string tempLogFilePath = Path.Combine(Path.GetTempPath(), $"diagnostic_log_test_{Guid.NewGuid()}.txt");
+        _testLogger = new Logger(tempLogFilePath);
         Vector initialPosition = new(10.0, 10.0);
         Vector delta = new(0.0, 0.0); // <- delta do przesunięcia
         double weight = 1.0;
-        Ball newInstance = new(initialPosition, new Vector(0.0, 0.0), weight);
+        Ball newInstance = new(initialPosition, new Vector(0.0, 0.0), weight, _testLogger);
         IVector curentPosition = new Vector(0.0, 0.0);
         int numberOfCallBackCalled = 0;
 

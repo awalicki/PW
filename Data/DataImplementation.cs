@@ -18,7 +18,11 @@ namespace TP.ConcurrentProgramming.Data
 {
     internal class DataImplementation : DataAbstractAPI
     {
-        public DataImplementation() { }
+        private readonly Logger _logger;
+        public DataImplementation() 
+        {
+            _logger = new Logger("..\\..\\..\\..\\diagnostic_log.txt");
+        }
 
         private readonly List<Task> _ballTasks = new List<Task>();
         private readonly List<Ball> _ballsList = new List<Ball>();
@@ -58,7 +62,7 @@ namespace TP.ConcurrentProgramming.Data
 
                 Vector startingVelocity = new(random.Next(-100 - -20, 100 - 20), random.Next(-100 - -20, 100 - 20));
                 double weight = 1.0;
-                Ball newBall = new(startingPosition, startingVelocity, weight);
+                Ball newBall = new(startingPosition, startingVelocity, weight, _logger);
                 upperLayerHandler(startingPosition, newBall);
                 Task movementTask = newBall.StartMovementTask();
                 lock (_balllock)
@@ -114,10 +118,15 @@ namespace TP.ConcurrentProgramming.Data
 
                     _ballTasks.Clear();
                     _ballsList.Clear();
+                    _logger.Dispose();
                 }
 
                 Disposed = true;
             }
+        }
+        public override void LogDiagnosticData(DiagnosticData data)
+        {
+            _logger.Log(data);
         }
 
         public override void Dispose()

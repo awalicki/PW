@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using TP.ConcurrentProgramming.Data;
 using UnderneathLayerAPI = TP.ConcurrentProgramming.Data.DataAbstractAPI;
 
 namespace TP.ConcurrentProgramming.BusinessLogic
@@ -105,6 +106,16 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
                     if (dotProduct < 0)
                     {
+                        layerBellow.LogDiagnosticData(new DiagnosticData
+                        {
+                            Timestamp = DateTime.Now,
+                            PositionX = pos1.x,
+                            PositionY = pos1.y,
+                            VelocityX = v1.x,
+                            VelocityY = v1.y,
+                            EventType = DiagnosticEventType.CollisionDetected,
+                            Message = $"Collision detected between balls at ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2}). Old V1: ({v1.x:F2},{v1.y:F2}), Old V2: ({v2.x:F2},{v2.y:F2})."
+                        });
                         Console.WriteLine($"BL: Collision detected between balls at ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2}). Dot product: {dotProduct:F2}");
 
                         double totalMass = m1 + m2;
@@ -136,6 +147,16 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                         }
                         else
                         {
+                            layerBellow.LogDiagnosticData(new DiagnosticData
+                            {
+                                Timestamp = DateTime.Now,
+                                PositionX = pos1.x,
+                                PositionY = pos1.y,
+                                VelocityX = v1.x,
+                                VelocityY = v1.y,
+                                EventType = DiagnosticEventType.CollisionNoBounce,
+                                Message = $"Balls overlapping but moving apart. Dot product: {dotProduct:F2}. Positions: ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2})."
+                            });
                             Console.WriteLine("BL: Total mass is zero, cannot calculate collision response.");
                         }
                     }
