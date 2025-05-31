@@ -19,6 +19,19 @@ namespace TP.ConcurrentProgramming.Data
         public Logger(string logFilePath, int bufferCapacity = 1000)
         {
             _logFilePath = logFilePath;
+            string? logDirectory = Path.GetDirectoryName(_logFilePath);
+            if (!string.IsNullOrEmpty(logDirectory) && !Directory.Exists(logDirectory))
+            {
+                try
+                {
+                    Directory.CreateDirectory(logDirectory);
+                    Console.WriteLine($"Created log directory: {logDirectory}");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error creating log directory '{logDirectory}': {ex.Message}");
+                }
+            }
             _buffer = new DiagnosticBuffer(bufferCapacity);
             _cancellationTokenSource = new CancellationTokenSource();
             _loggingTask = Task.Run(() => ProcessLogQueue(_cancellationTokenSource.Token));
