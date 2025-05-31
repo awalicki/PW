@@ -21,7 +21,7 @@ namespace TP.ConcurrentProgramming.Data
         private readonly Logger _logger;
         public DataImplementation() 
         {
-            _logger = new Logger("..\\..\\..\\..\\diagnostic_log.txt");
+            _logger = new Logger("..\\..\\..\\..\\Logs\\diagnostic.log");
         }
 
         private readonly List<Task> _ballTasks = new List<Task>();

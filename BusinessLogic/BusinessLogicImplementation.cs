@@ -77,7 +77,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             var pos1 = movedBall.GetPosition();
             var v1 = movedBall.GetVelocity();
             var m1 = movedBall.GetWeight();
-
+            int id1 = movedBall.GetId();
 
             List<Ball> ballsCopy;
             lock (_lock)
@@ -93,6 +93,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 var pos2 = other.GetPosition();
                 var v2 = other.GetVelocity();
                 var m2 = other.GetWeight();
+                int id2 = other.GetId();
                 var r1 = other.GetBallRadius();
 
                 if (AreBallsColliding(pos1, pos2, r1))
@@ -114,9 +115,9 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                             VelocityX = v1.x,
                             VelocityY = v1.y,
                             EventType = DiagnosticEventType.CollisionDetected,
-                            Message = $"Collision detected between balls at ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2}). Old V1: ({v1.x:F2},{v1.y:F2}), Old V2: ({v2.x:F2},{v2.y:F2})."
+                            Message = $"Collision detected between balls: {id1} and {id2}."
                         });
-                        Console.WriteLine($"BL: Collision detected between balls at ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2}). Dot product: {dotProduct:F2}");
+                        Console.WriteLine($"BL: Collision detected between balls: {id1}, {id2} at ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2}). Dot product: {dotProduct:F2}");
 
                         double totalMass = m1 + m2;
 

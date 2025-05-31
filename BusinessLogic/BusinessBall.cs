@@ -46,7 +46,12 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         {
             return _underlyingBall.Weight;
         }
-        
+
+        public int GetId()
+        {
+            return _underlyingBall.Id;
+        }
+
         public double GetBallRadius()
         {
             return _underlyingBall.BallRadius;
@@ -67,12 +72,14 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
             IPosition pos1 = _currentPosition;
             Data.IVector v1 = GetVelocity();
+            int id = GetId();
             double currentVx = v1.x;
             double currentVy = v1.y;
             double newVx = currentVx;
             double newVy = currentVy;
             double positionX = pos1.x;
             double positionY = pos1.y;
+            
             if (positionX <= 0 && currentVx < 0)
             {
                 newVx = -currentVx;
@@ -104,12 +111,13 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 _dataLayer.LogDiagnosticData(new DiagnosticData
                 {
                     Timestamp = DateTime.Now,
+                    BallId = id,
                     PositionX = pos1.x,
                     PositionY = pos1.y,
                     VelocityX = newVx,
                     VelocityY = newVy,
                     EventType = DiagnosticEventType.WallBounce,
-                    Message = $"Wall bounce detected. New velocity: ({newVx:F2}, {newVy:F2}). "
+                    Message = $"Wall bounce detected."
                 });
                 Console.WriteLine($"BL: Updated Data Ball Velocity (Wall) to ({newVx:F2}, {newVy:F2})");
             }           

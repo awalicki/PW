@@ -403,3 +403,6 @@ FodyWeavers.xsd
 bin
 obj
 TestResults
+
+#Logi
+*.log

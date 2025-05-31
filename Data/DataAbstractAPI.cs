@@ -60,6 +60,7 @@ namespace TP.ConcurrentProgramming.Data
   public interface IBall
   {
     event EventHandler<IVector> NewPositionNotification;
+    int Id { get; }
 
     double Weight { get; }
     double BallRadius { get; }

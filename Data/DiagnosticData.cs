@@ -14,6 +14,7 @@ namespace TP.ConcurrentProgramming.Data
     public class DiagnosticData
     {
         public DateTime Timestamp { get; set; }
+        public int BallId { get; set; }
         public double PositionX { get; set; }
         public double PositionY { get; set; }
         public double VelocityX { get; set; }

@@ -54,12 +54,13 @@ namespace TP.ConcurrentProgramming.Data
             _logger.Log(new DiagnosticData
             {
                 Timestamp = DateTime.Now,
+                BallId = Id,
                 PositionX = Position.x,
                 PositionY = Position.y,
                 VelocityX = Velocity.x,
                 VelocityY = Velocity.y,
                 EventType = DiagnosticEventType.PositionUpdate,
-                Message = $"Ball position update: ({Position.x:F2}, {Position.y:F2}), Velocity: ({Velocity.x:F2}, {Velocity.y:F2})"
+                Message = $"Ball position update"
             });
         }
 
