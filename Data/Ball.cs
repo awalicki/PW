@@ -32,7 +32,7 @@ namespace TP.ConcurrentProgramming.Data
         public event EventHandler<IVector>? NewPositionNotification;
         private readonly object _velocityLock = new object();
 
-        public IVector Velocity { get; set;}
+        public IVector Velocity { get; set; }
 
         public double Weight { get; }
         public double BallRadius { get; }
@@ -72,13 +72,16 @@ namespace TP.ConcurrentProgramming.Data
 
         private async Task RunMovementLoop(CancellationToken token)
         {
-            const int movementIntervalMs = 16;
+            const int targetFrameTimeMs = 8;
+            long lastTick = DateTime.UtcNow.Ticks;
 
             while (!token.IsCancellationRequested)
             {
                 try
                 {
-                    await Task.Delay(movementIntervalMs, token);
+                    long currentTick = DateTime.UtcNow.Ticks;
+                    double deltaTime = TimeSpan.FromTicks(currentTick - lastTick).TotalSeconds;
+                    lastTick = currentTick;
 
                     IVector currentVelocity;
                     lock (_velocityLock)
@@ -87,9 +90,16 @@ namespace TP.ConcurrentProgramming.Data
                     }
 
                     Vector velocityVector = (Vector)currentVelocity;
-                    Vector delta = velocityVector * (movementIntervalMs / 1000.0);
+                    Vector delta = velocityVector * deltaTime;
 
                     Move(delta);
+                    long processingTimeMs = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - currentTick).Milliseconds;
+                    int timeToWait = (int)Math.Max(0, targetFrameTimeMs - processingTimeMs);
+
+                    if (timeToWait > 0)
+                    {
+                        await Task.Delay(timeToWait, token);
+                    }
                 }
                 catch (TaskCanceledException)
                 {
