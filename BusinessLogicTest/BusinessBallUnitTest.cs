@@ -46,6 +46,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             public double Weight => 1.0;
             public double BallRadius => 10.0;
 
+            public int Id => 0;
+
             public event EventHandler<Data.IVector>? NewPositionNotification;
 
             internal void Move()
@@ -74,6 +76,11 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             public override IVector CreateVector(double x, double y)
             {
                 return new MockVector(x, y);
+            }
+
+            public override void LogDiagnosticData(DiagnosticData data)
+            {
+                
             }
 
             private record MockVector(double x, double y) : IVector;

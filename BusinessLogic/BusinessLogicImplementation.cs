@@ -156,7 +156,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                                 VelocityX = v1.x,
                                 VelocityY = v1.y,
                                 EventType = DiagnosticEventType.CollisionNoBounce,
-                                Message = $"Balls overlapping but moving apart. Dot product: {dotProduct:F2}. Positions: ({pos1.x:F2},{pos1.y:F2}) and ({pos2.x:F2},{pos2.y:F2})."
+                                Message = $"Balls {id1} and {id2} overlapping but moving apart."
                             });
                             Console.WriteLine("BL: Total mass is zero, cannot calculate collision response.");
                         }
