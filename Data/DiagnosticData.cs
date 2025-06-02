@@ -8,7 +8,8 @@ namespace TP.ConcurrentProgramming.Data
         PositionUpdate,
         WallBounce,
         CollisionDetected,
-        CollisionNoBounce
+        CollisionNoBounce,
+        DelayDetected
     }
 
     public class DiagnosticData

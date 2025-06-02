@@ -73,6 +73,7 @@ namespace TP.ConcurrentProgramming.Data
         private async Task RunMovementLoop(CancellationToken token)
         {
             const int targetFrameTimeMs = 8;
+            const int delayThresholdMs = 2;
             long lastTick = DateTime.UtcNow.Ticks;
 
             while (!token.IsCancellationRequested)
@@ -95,6 +96,21 @@ namespace TP.ConcurrentProgramming.Data
                     Move(delta);
                     long processingTimeMs = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - currentTick).Milliseconds;
                     int timeToWait = (int)Math.Max(0, targetFrameTimeMs - processingTimeMs);
+
+                    if (processingTimeMs > targetFrameTimeMs + delayThresholdMs)
+                    {
+                        _logger.Log(new DiagnosticData
+                        {
+                            Timestamp = DateTime.Now,
+                            BallId = Id,
+                            PositionX = Position.x,
+                            PositionY = Position.y,
+                            VelocityX = Velocity.x,
+                            VelocityY = Velocity.y,
+                            EventType = DiagnosticEventType.DelayDetected,
+                            Message = $"Delay detected: processing time {processingTimeMs}ms exceeds target {targetFrameTimeMs}ms by {processingTimeMs - targetFrameTimeMs}ms"
+                        });
+                    }
 
                     if (timeToWait > 0)
                     {

@@ -64,32 +64,24 @@ namespace TP.ConcurrentProgramming.Data
                         DiagnosticData? dataToLog = null;
                         lock (_lock)
                         {
-                            if (_buffer.TryTake(out dataToLog))
-                            {
-                                // Data found, proceed to log
-                            }
-                            else
-                            {
-                                // Buffer is empty, wait for a short period before checking again
-                            }
+                            if (_buffer.TryTake(out dataToLog)){}
+                            else {}
                         }
 
                         if (dataToLog != null)
                         {
                             await sw.WriteLineAsync(dataToLog.ToJson());
-                            await sw.FlushAsync(); // Ensure data is written to disk promptly
+                            await sw.FlushAsync(); 
                         }
                         else
                         {
-                            await Task.Delay(50, token); // Wait if buffer is empty
+                            await Task.Delay(50, token); 
                         }
                     }
                 }
             }
             catch (TaskCanceledException)
-            {
-                // Task was cancelled, expected behavior during shutdown
-            }
+            {}
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in logging task: {ex.Message}");
